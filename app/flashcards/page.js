@@ -6,11 +6,22 @@ import { useEffect, useState } from 'react';
 import { db } from '@/firebase';
 import { Grid, Container, Card, CardActionArea, CardContent, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import Loader from '../components/Loader';
 
 export default function Flashcard(){
     const {isLoaded, isSignedIn, user} = useUser();
     const [flashcards, setFlashcards] = useState([]);
     const router = useRouter();
+
+    useEffect(() => {
+      if (isLoaded && !isSignedIn) {
+          router.push('/');
+      }
+    }, [isLoaded, isSignedIn, router]);
+
+    if (!isLoaded || !isSignedIn) {
+        return <Loader />;
+    }
     
     useEffect(() => {
         async function getFlashcards() {

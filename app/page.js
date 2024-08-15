@@ -17,6 +17,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { UserButton } from '@clerk/nextjs';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import getStripe from '@/utils/get-stripe'
+import Loader from './components/Loader';
 
 
 const theme = createTheme({
@@ -98,11 +99,12 @@ export default function Home() {
         >
           <Container>
             <Typography variant="h2" component="h1" gutterBottom>
-              Transform Your Notes into YEAHHHH
+              Transform Your Notes into Flashcards
             </Typography>
             <Typography variant="h5" component="p" gutterBottom>
               Boost your learning with our intelligent flashcard generator.
             </Typography>
+
             <Button variant="contained" color="primary" size="large">
               Get Started
             </Button>

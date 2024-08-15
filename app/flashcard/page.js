@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import { db } from '@/firebase';
 import { Grid, Container, Card, CardActionArea, CardContent, Typography } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
+import Loader from '../components/Loader';
+import { useRouter } from 'next/navigation';
 
 export default function Flashcard() {
     const { isSignedIn, isLoaded, user } = useUser();
@@ -13,6 +15,17 @@ export default function Flashcard() {
     const search = searchParams.get('id');
     const [flashcards, setFlashcards] = useState([]);
     const [flipped, setFlipped] = useState({});
+    const router = useRouter();
+
+    useEffect(() => {
+        if (isLoaded && !isSignedIn) {
+            router.push('/');
+        }
+    }, [isLoaded, isSignedIn, router]);
+
+    if (!isLoaded || !isSignedIn) {
+        return <Loader />;
+    }
 
     useEffect(() => {
         async function getFlashcard() {

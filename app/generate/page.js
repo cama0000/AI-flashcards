@@ -1,11 +1,12 @@
 'use client'
 
 import { useUser } from "@clerk/nextjs"
-import { Button, TextField, Container, Typography, DialogTitle, Dialog, DialogContent, DialogContentText, DialogActions, Box, Grid, Card, CardActionArea, CardContent } from "@mui/material";
+import { Button, TextField, Container, Typography, DialogTitle, Dialog, DialogContent, DialogContentText, DialogActions, Box, Grid, Card, CardActionArea, CardContent, CircularProgress } from "@mui/material";
 import { collection, doc, getDoc, writeBatch } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from '@/firebase';
+import Loader from "../components/Loader";
 
 // TODO: Check if signed in or not
 
@@ -17,6 +18,16 @@ export default function Generate(){
     const [name, setName] = useState('');
     const [open, setOpen] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        if (isLoaded && !isSignedIn) {
+            router.push('/');
+        }
+    }, [isLoaded, isSignedIn, router]);
+
+    if (!isLoaded || !isSignedIn) {
+        return <Loader />;
+    }
 
     const handleSubmit = async() =>{
         fetch('api/generate', {
@@ -83,6 +94,7 @@ export default function Generate(){
 
     return (
         <Container maxWidth="sm" style={{ marginTop: '50px' }}>
+
             <TextField
             label="Enter text"
             variant="outlined"
