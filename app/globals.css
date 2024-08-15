@@ -26,6 +26,22 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.primaryBlue {
+  background-color: theme('colors.primaryBlue');
+}
+
+.primaryPink {
+  background-color: theme('colors.primaryPink');
+}
+
+.secondaryBlue {
+  background-color: theme('colors.secondaryBlue');
+}
+
+.secondaryPink {
+  background-color: theme('colors.secondaryPink');
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

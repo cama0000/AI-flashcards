@@ -4,24 +4,25 @@ import { useUser } from '@clerk/nextjs'
 import { collection, getDoc, setDoc, doc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '@/firebase';
-import { Grid, Container, Card, CardActionArea, CardContent, Typography } from '@mui/material';
+import { Grid, Container, Card, CardActionArea, CardContent, Typography, Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import Loader from '../components/Loader';
+import Header from '../components/Header';
 
 export default function Flashcard(){
     const {isLoaded, isSignedIn, user} = useUser();
     const [flashcards, setFlashcards] = useState([]);
     const router = useRouter();
 
-    useEffect(() => {
-      if (isLoaded && !isSignedIn) {
-          router.push('/');
-      }
-    }, [isLoaded, isSignedIn, router]);
+    // useEffect(() => {
+    //   if (isLoaded && !isSignedIn) {
+    //       router.push('/');
+    //   }
+    // }, [isLoaded, isSignedIn, router]);
 
-    if (!isLoaded || !isSignedIn) {
-        return <Loader />;
-    }
+    // if (!isLoaded || !isSignedIn) {
+    //     return <Loader />;
+    // }
     
     useEffect(() => {
         async function getFlashcards() {
@@ -51,6 +52,10 @@ export default function Flashcard(){
     }
 
     return (
+      <>
+      <Box sx={{ width: '100%' }}>
+          <Header />
+      </Box>
 <Container maxWidth="md">
   <Grid container spacing={3} sx={{ mt: 4 }}>
     {flashcards.map((flashcard, index) => (
@@ -68,6 +73,7 @@ export default function Flashcard(){
     ))}
   </Grid>
 </Container>
+</>
 
     )
 }

@@ -2,7 +2,7 @@
 
 'use client'
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,8 +17,14 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { UserButton } from '@clerk/nextjs';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import getStripe from '@/utils/get-stripe'
+import { IconButton, Stack } from '@mui/material';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import EmailIcon from '@mui/icons-material/Email';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs'
 import Loader from './components/Loader';
-
+import Header from './components/Header';
 
 const theme = createTheme({
   palette: {
@@ -32,6 +38,19 @@ const theme = createTheme({
 });
 
 export default function Home() {
+  const {isLoaded, isSignedIn, user} = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+        router.push('/flashcards');
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  // if (!isLoaded) {
+  //     return <Loader />;
+  // }
+
   const handleSubmit = async () => {
     const checkoutSession = await fetch('/api/checkout_session', {
       method: 'POST',
@@ -65,89 +84,83 @@ export default function Home() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Head>
-        <title>Flashcard SaaS</title>
-        <meta name="description" content="Transform your notes into flashcards" />
+        <title>Quanta</title>
+        <meta name="description" content="Generate flashcards with a single click." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      
-      <AppBar position="static">
-        <Container>
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Flashcard SaaS
-            </Typography>
 
-            <SignedOut>
-              <Button color="inherit" href='sign-in'>Login</Button>
-              <Button color="inherit" href='sign-up'>Sign Up</Button>
-            </SignedOut>
-
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </Toolbar>
-        </Container>
-      </AppBar>
+    <Header/>
       
       <main>
         <Box
           sx={{
-            backgroundColor: '#f5f5f5',
             padding: '80px 0',
             textAlign: 'center',
           }}
+
+          className="bg-primaryPink"
         >
-          <Container>
-            <Typography variant="h2" component="h1" gutterBottom>
-              Transform Your Notes into Flashcards
-            </Typography>
-            <Typography variant="h5" component="p" gutterBottom>
-              Boost your learning with our intelligent flashcard generator.
+            <Typography variant="h2" sx={{color: '#ffffff', fontStyle: 'bold', fontSize: '75px'}} gutterBottom>
+              Generate flashcards with a single click.
             </Typography>
 
-            <Button variant="contained" color="primary" size="large">
-              Get Started
-            </Button>
+            <Typography variant="h5" sx={{color: '#000000', fontStyle: 'italic'}} gutterBottom>
+              All you need is your notes, we'll handle the rest.
+            </Typography>
 
-            <Button variant="contained" color="primary" size="large" onClick={handleSubmit}>
+            <Button className='w-32 mt-16 mb-16' size='large' variant="contained" href='sign-up'>JOIN NOW</Button>
+
+
+            {/* <Button variant='contained' color="primary" size="large" onClick={handleSubmit}>
               Go PRO
-            </Button>
+            </Button> */}
 
-          </Container>
         </Box>
         
-        <Container sx={{ padding: '40px 0' }}>
-          <Typography variant="h4" component="h2" gutterBottom textAlign="center">
-            Features
-          </Typography>
-          <Grid container spacing={4}>
-            {[
-              {
-                title: 'AI-Powered Flashcards',
-                description: 'Automatically generate flashcards from your notes using AI technology.',
-              },
-              {
-                title: 'Customizable Decks',
-                description: 'Create and organize decks according to your study needs.',
-              },
-              {
-                title: 'Mobile Friendly',
-                description: 'Access your flashcards on any device, anytime, anywhere.',
-              },
-            ].map((feature, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <Paper sx={{ padding: '20px', height: '100%' }}>
-                  <Typography variant="h6" component="h3" gutterBottom>
-                    {feature.title}
-                  </Typography>
-                  <Typography variant="body1">{feature.description}</Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
+        <Box 
+            sx={{ 
+                width: '100%', 
+                padding: '40px 0',
+                boxSizing: 'border-box'
+            }}
+
+            className="bg-secondaryBlue"
+        >
+            <Container>
+                <Typography variant="h4" gutterBottom textAlign="center">
+                    Features
+                </Typography>
+                <Grid container spacing={4}>
+                    {[
+                        {
+                            title: 'AI-Powered Flashcards',
+                            description: 'Automatically generate flashcards from your notes using AI technology.',
+                        },
+                        {
+                            title: 'Customizable Decks',
+                            description: 'Create and organize decks according to your study needs.',
+                        },
+                        {
+                            title: 'Mobile Friendly',
+                            description: 'Access your flashcards on any device, anytime, anywhere.',
+                        },
+                    ].map((feature, index) => (
+                        <Grid item xs={12} md={4} key={index}>
+                            <Paper sx={{ padding: '20px', height: '100%' }}>
+                                <Typography variant="h6" component="h3" gutterBottom>
+                                    {feature.title}
+                                </Typography>
+                                <Typography variant="body1">{feature.description}</Typography>
+                            </Paper>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Container>
+        </Box>
+
       </main>
       
+      {/* FOOTER */}
       <Box
         component="footer"
         sx={{
@@ -157,8 +170,21 @@ export default function Home() {
           textAlign: 'center',
         }}
       >
+                <Box display="flex" justifyContent="center" mb={1}>
+          <IconButton className='hover:scale-105 duration-200' href="https://www.linkedin.com/in/cameronarmijo000/" target="_blank" color="inherit">
+            <LinkedInIcon />
+          </IconButton>
+          <IconButton className='hover:scale-105 duration-200' href="https://github.com/cama0000" target="_blank" color="inherit">
+            <GitHubIcon />
+          </IconButton>
+          <IconButton className='hover:scale-105 duration-200' href="mailto:acama0000@gmail.com" color="inherit">
+            <EmailIcon />
+          </IconButton>
+        </Box>
         <Container>
-          <Typography variant="body1">&copy; 2024 Flashcard SaaS</Typography>
+          <Typography variant="body2">
+            © {new Date().getFullYear()} Quanta. All rights reserved.
+          </Typography>
         </Container>
       </Box>
     </ThemeProvider>
