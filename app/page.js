@@ -98,7 +98,7 @@ export default function Home() {
         >
           <Container>
             <Typography variant="h2" component="h1" gutterBottom>
-              Transform Your Notes into Flashcards
+              Transform Your Notes into YEAHHHH
             </Typography>
             <Typography variant="h5" component="p" gutterBottom>
               Boost your learning with our intelligent flashcard generator.
