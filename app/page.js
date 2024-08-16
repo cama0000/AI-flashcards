@@ -85,7 +85,7 @@ export default function Home() {
       <CssBaseline />
       <Head>
         <title>Quanta</title>
-        <meta name="description" content="Generate flashcards with a single click." />
+        <meta name="Quanta" content="AI-Flashcard Generator" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -157,6 +157,49 @@ export default function Home() {
                 </Grid>
             </Container>
         </Box>
+
+
+
+        {/* <Box 
+            sx={{ 
+                width: '100%', 
+                padding: '40px 0',
+                boxSizing: 'border-box'
+            }}
+
+            className="bg-secondaryPink"
+        >
+            <Container>
+                <Typography variant="h4" gutterBottom textAlign="center">
+                    Pricing
+                </Typography>
+                <Grid container spacing={4}>
+                    {[
+                        {
+                            title: 'AI-Powered Flashcards',
+                            description: 'Automatically generate flashcards from your notes using AI technology.',
+                        },
+                        {
+                            title: 'Customizable Decks',
+                            description: 'Create and organize decks according to your study needs.',
+                        },
+                        {
+                            title: 'Mobile Friendly',
+                            description: 'Access your flashcards on any device, anytime, anywhere.',
+                        },
+                    ].map((feature, index) => (
+                        <Grid item xs={12} md={4} key={index}>
+                            <Paper sx={{ padding: '20px', height: '100%' }}>
+                                <Typography variant="h6" component="h3" gutterBottom>
+                                    {feature.title}
+                                </Typography>
+                                <Typography variant="body1">{feature.description}</Typography>
+                            </Paper>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Container>
+        </Box> */}
 
       </main>
       
