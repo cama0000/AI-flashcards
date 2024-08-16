@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { db } from '@/firebase';
 import { Grid, Container, Card, CardActionArea, CardContent, Typography, Button, Box, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
-import Loader from '../components/Loader';
 import { useRouter } from 'next/navigation';
 import Header from '../components/Header';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -17,7 +16,7 @@ export default function Flashcard() {
     const searchParams = useSearchParams();
     const search = searchParams.get('id');
     const [flashcards, setFlashcards] = useState([]);
-    const [flipped, setFlipped] = useState({});
+    const [flipped, setFlipped] = useState({});  // Track flip state of each card
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [front, setFront] = useState('');
@@ -48,15 +47,12 @@ export default function Flashcard() {
         getFlashcard();
     }, [search, user]);
 
-    // const toggleFlip = (id) => {
-    //     setFlipped(prev => ({ ...prev, [id]: !prev[id] }));
-    // };
-
     const handleCardClick = (id) => {
         setFlipped((prev) => ({
-            [id]: !prev[id],
-        }))
-    }
+            ...prev,
+            [id]: !prev[id],  // Toggle the specific card's flip state
+        }));
+    };
 
     if(!isSignedIn || !isLoaded) {
         return null;
@@ -73,34 +69,43 @@ export default function Flashcard() {
     }
 
     const saveFlashcard = async () => {
-        if(!front || !back || !search || !user) {
+        if(front === '' && back === '') {
+            alert("Please enter the front and back of the card.");
+            return;
+        }
+
+        if(front === ''){
+            alert("Please enter the front of the card.");
+            return;
+        }
+        if(back === ''){
+            alert("Please enter the back of the card.");
+            return;
+        }
+
+        if(!search || !user) {
+            alert("Error: No collection found.");
             return;
         }
 
         try {
-            // Reference to the specific collection within the user's document
             const colRef = collection(doc(db, 'users', user.id), search);
-
-            // Add a new flashcard document to the collection
             await addDoc(colRef, {
                 front: front,
                 back: back,
             });
 
-            // Optionally: Update the local state to show the newly added card
             setFlashcards(prevFlashcards => [
                 ...prevFlashcards,
                 { front, back },
             ]);
 
             toast.success('Flashcard added successfully!');
-
-            // Close the dialog
             handleClose();
         } catch (error) {
             console.error("Error adding flashcard: ", error);
         }
-    }
+    };
 
     return (
     <>
@@ -117,156 +122,129 @@ export default function Flashcard() {
             }}
         >
 
-<Button 
-            sx={{ 
-                marginBottom: '10px',  // Adds a bottom margin of 10 pixels
-            }}
-
-            onClick={handleOpen}
-        >
-            <AddCircleIcon 
+            <Button 
                 sx={{ 
-                    fontSize: 40,  // Icon size
-                    color: 'purple' // Icon color
-                }} 
-            />
-        </Button>
+                    marginBottom: '10px',
+                }}
+                onClick={handleOpen}
+            >
+                <AddCircleIcon 
+                    sx={{ 
+                        fontSize: 40,
+                        color: 'purple',
+                    }} 
+                />
+            </Button>
 
-            {/* OLD STYLE */}
-            {/* <Grid container spacing={3} sx={{ mt: 4 }}>
+            <Grid container spacing={3}>
                 {flashcards.map((flashcard, index) => (
                     <Grid item xs={12} sm={6} md={4} key={index}>
-                        <CardActionArea
-                            onClick={() => toggleFlip(flashcard.id)}
-                            sx={{ height: '100%' }}
-                        >
-                            <Card sx={{ minHeight: '250px', display: 'flex', alignItems: 'center' }}>
-                                                         <CardContent>
-                                     <Typography variant="h5" component="div">
-                                         {flipped[flashcard.id] ? flashcard.back : flashcard.front}
-                                     </Typography>
-                                 </CardContent>
-                            </Card>
-                        </CardActionArea>
+                        <Card sx={{
+                            height: '300px',
+                            width: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden',
+                        }}>
+                            <CardActionArea onClick={() => handleCardClick(index)} sx={{ height: '100%' }}>
+                                <CardContent sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    height: '100%',
+                                    padding: 2,
+                                    boxSizing: 'border-box',
+                                }}>
+                                    <Box sx={{
+                                        perspective: '1000px',
+                                        width: '100%',
+                                        height: '100%',
+                                        '& > div': {
+                                            transition: 'transform 0.6s',
+                                            transformStyle: 'preserve-3d',
+                                            position: 'relative',
+                                            width: '100%',
+                                            height: '100%',
+                                            boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+                                            transform: flipped[index] ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                                        },
+                                        '& > div > div': {
+                                            position: 'absolute',
+                                            width: '100%',
+                                            height: '100%',
+                                            backfaceVisibility: 'hidden',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            padding: 2,
+                                            boxSizing: 'border-box',
+                                        },
+                                        '& > div > .back': {
+                                            transform: 'rotateY(180deg)',
+                                        },
+                                    }}>
+                                        <div>
+                                            <div className="front">
+                                                <Typography variant="h5" component="div" sx={{
+                                                    fontSize: '1.25rem',
+                                                    textAlign: 'center',
+                                                    whiteSpace: 'normal',
+                                                }}>
+                                                    {flashcard.front}
+                                                </Typography>
+                                            </div>
+                                            <div className="back">
+                                                <Typography variant="h5" component="div" sx={{
+                                                    fontSize: '1.25rem',
+                                                    textAlign: 'center',
+                                                    whiteSpace: 'normal',
+                                                }}>
+                                                    {flashcard.back}
+                                                </Typography>
+                                            </div>
+                                        </div>
+                                    </Box>
+                                </CardContent>
+                            </CardActionArea>
+                        </Card>
                     </Grid>
                 ))}
-            </Grid> */}
-
-<Grid container spacing={3}>
-    {flashcards.map((flashcard, index) => (
-        <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card sx={{
-                height: '300px',
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
-            }}>
-                <CardActionArea onClick={() => handleCardClick(index)} sx={{ height: '100%' }}>
-                    <CardContent sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: '100%',
-                        padding: 2,
-                        boxSizing: 'border-box',
-                    }}>
-                        <Box sx={{
-                            perspective: '1000px',
-                            width: '100%',
-                            height: '100%',
-                            '& > div': {
-                                transition: 'transform 0.6s',
-                                transformStyle: 'preserve-3d',
-                                position: 'relative',
-                                width: '100%',
-                                height: '100%',
-                                boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-                                transform: flipped[index] ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                            },
-                            '& > div > div': {
-                                position: 'absolute',
-                                width: '100%',
-                                height: '100%',
-                                backfaceVisibility: 'hidden',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                padding: 2,
-                                boxSizing: 'border-box',
-                            },
-                            '& > div > .back': {
-                                transform: 'rotateY(180deg)',
-                            },
-                        }}>
-                            <div>
-                                <div className="front">
-                                    <Typography variant="h5" component="div" sx={{
-                                        fontSize: '1.25rem',
-                                        textAlign: 'center',
-                                        whiteSpace: 'normal',
-                                    }}>
-                                        {flashcard.front}
-                                    </Typography>
-                                </div>
-                                <div className="back">
-                                    <Typography variant="h5" component="div" sx={{
-                                        fontSize: '1.25rem',
-                                        textAlign: 'center',
-                                        whiteSpace: 'normal',
-                                    }}>
-                                        {flashcard.back}
-                                    </Typography>
-                                </div>
-                            </div>
-                        </Box>
-                    </CardContent>
-                </CardActionArea>
-            </Card>
-        </Grid>
-    ))}
-</Grid>
-
-            
+            </Grid>
         </Container>
-
 
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>
                 Add Flashcard
             </DialogTitle>
-            
             <DialogContent>
                 <DialogContentText>
                     Please enter front and back of the flashcard.
                 </DialogContentText>
 
                 <TextField
-                autoFocus
-                margin="dense"
-                label="Front of card"
-                type="text"
-                fullWidth
-                value={front}
-                onChange={(e)  => setFront(e.target.value)}
-                variant="outlined"
+                    autoFocus
+                    margin="dense"
+                    required
+                    label="Front of card"
+                    type="text"
+                    fullWidth
+                    value={front}
+                    onChange={(e)  => setFront(e.target.value)}
+                    variant="outlined"
                 />
 
                 <TextField
-                autoFocus
-                margin="dense"
-                label="Back of card"
-                type="text"
-                fullWidth
-                value={back}
-                onChange={(e)  => setBack(e.target.value)}
-                variant="outlined"
+                    margin="dense"
+                    required
+                    label="Back of card"
+                    type="text"
+                    fullWidth
+                    value={back}
+                    onChange={(e)  => setBack(e.target.value)}
+                    variant="outlined"
                 />
-
-
             </DialogContent>
-
             <DialogActions>
                 <Button onClick={handleClose}>
                     Cancel
@@ -276,9 +254,7 @@ export default function Flashcard() {
                 </Button>
             </DialogActions>
         </Dialog>
-
-
     </Box>
-</>
+    </>
     );
 }
