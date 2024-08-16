@@ -164,7 +164,7 @@ export default function Generate(){
 
         <Header/>
 
-{/* <Container
+<Container
     maxWidth="lg"
     style={{                 
         backgroundColor: '#ffc0cb',
@@ -220,68 +220,7 @@ export default function Generate(){
     >
         Generate
     </Button>
-</Container> */}
-
-<Container
-    maxWidth="lg"
-    style={{                 
-        backgroundColor: '#ffc0cb',
-        padding: '20px',
-        borderRadius: '8px',
-        marginTop: '40px',
-    }}
->
-    <ToggleButtonGroup
-        value={inputMode}
-        exclusive
-        onChange={(e, newMode) => setInputMode(newMode)}
-        aria-label="input mode"
-        style={{ marginBottom: '20px' }}
-    >
-        <ToggleButton value="text" aria-label="text input">
-            Text
-        </ToggleButton>
-        <ToggleButton value="file" aria-label="file input">
-            File
-        </ToggleButton>
-    </ToggleButtonGroup>
-
-    {inputMode === 'text' && (
-        <TextField
-            label="Enter text"
-            variant="outlined"
-            fullWidth
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            style={{ marginBottom: '20px' }}
-            InputProps={{
-                style: { color: 'white' },
-            }}
-            InputLabelProps={{
-                style: { color: 'white' },
-            }}
-        />
-    )}
-
-    {inputMode === 'file' && (
-        <input
-            type="file"
-            accept=".txt"
-            onChange={(e) => setFile(e.target.files[0])}
-            style={{ marginBottom: '20px', color: 'white' }}
-        />
-    )}
-
-    <Button
-        variant="contained"
-        className="bg-primaryBlue"
-        fullWidth
-        onClick={handleSubmit}
-    >
-        Generate
-    </Button>
 </Container>
-
 
 
 
