@@ -1,14 +1,16 @@
 'use client'
 
 import { useUser } from '@clerk/nextjs';
-import { collection, doc, getDocs } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '@/firebase';
-import { Grid, Container, Card, CardActionArea, CardContent, Typography, Button, Box } from '@mui/material';
+import { Grid, Container, Card, CardActionArea, CardContent, Typography, Button, Box, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
 import Loader from '../components/Loader';
 import { useRouter } from 'next/navigation';
 import Header from '../components/Header';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { toast } from 'react-toastify';
 
 export default function Flashcard() {
     const { isSignedIn, isLoaded, user } = useUser();
@@ -17,6 +19,9 @@ export default function Flashcard() {
     const [flashcards, setFlashcards] = useState([]);
     const [flipped, setFlipped] = useState({});
     const router = useRouter();
+    const [open, setOpen] = useState(false);
+    const [front, setFront] = useState('');
+    const [back, setBack] = useState('');
 
     useEffect(() => {
         if (isLoaded && !isSignedIn) {
@@ -57,10 +62,51 @@ export default function Flashcard() {
         return null;
     }
 
+    const handleOpen = () => {
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setFront('');
+        setBack('');
+        setOpen(false);
+    }
+
+    const saveFlashcard = async () => {
+        if(!front || !back || !search || !user) {
+            return;
+        }
+
+        try {
+            // Reference to the specific collection within the user's document
+            const colRef = collection(doc(db, 'users', user.id), search);
+
+            // Add a new flashcard document to the collection
+            await addDoc(colRef, {
+                front: front,
+                back: back,
+            });
+
+            // Optionally: Update the local state to show the newly added card
+            setFlashcards(prevFlashcards => [
+                ...prevFlashcards,
+                { front, back },
+            ]);
+
+            toast.success('Flashcard added successfully!');
+
+            // Close the dialog
+            handleClose();
+        } catch (error) {
+            console.error("Error adding flashcard: ", error);
+        }
+    }
+
     return (
     <>
     <Box sx={{ width: '100%', minHeight: '100vh' }} className="bg-primaryBlue">
         <Header />
+
         <Container
             maxWidth="lg"
             sx={{
@@ -70,6 +116,21 @@ export default function Flashcard() {
                 marginTop: '40px',
             }}
         >
+
+<Button 
+            sx={{ 
+                marginBottom: '10px',  // Adds a bottom margin of 10 pixels
+            }}
+
+            onClick={handleOpen}
+        >
+            <AddCircleIcon 
+                sx={{ 
+                    fontSize: 40,  // Icon size
+                    color: 'purple' // Icon color
+                }} 
+            />
+        </Button>
 
             {/* OLD STYLE */}
             {/* <Grid container spacing={3} sx={{ mt: 4 }}>
@@ -167,15 +228,56 @@ export default function Flashcard() {
     ))}
 </Grid>
 
-
-
-
-
-
-
-
             
         </Container>
+
+
+        <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>
+                Add Flashcard
+            </DialogTitle>
+            
+            <DialogContent>
+                <DialogContentText>
+                    Please enter front and back of the flashcard.
+                </DialogContentText>
+
+                <TextField
+                autoFocus
+                margin="dense"
+                label="Front of card"
+                type="text"
+                fullWidth
+                value={front}
+                onChange={(e)  => setFront(e.target.value)}
+                variant="outlined"
+                />
+
+                <TextField
+                autoFocus
+                margin="dense"
+                label="Back of card"
+                type="text"
+                fullWidth
+                value={back}
+                onChange={(e)  => setBack(e.target.value)}
+                variant="outlined"
+                />
+
+
+            </DialogContent>
+
+            <DialogActions>
+                <Button onClick={handleClose}>
+                    Cancel
+                </Button>
+                <Button onClick={saveFlashcard}>
+                    Save
+                </Button>
+            </DialogActions>
+        </Dialog>
+
+
     </Box>
 </>
     );

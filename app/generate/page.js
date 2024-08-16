@@ -9,8 +9,6 @@ import { db } from '@/firebase';
 import Loader from "../components/Loader";
 import Header from "../components/Header";
 
-// TODO: Check if signed in or not
-
 export default function Generate(){
     const {isLoaded, isSignedIn, user} = useUser();
     const [flashcards, setFlashcards] = useState([]);
