@@ -1,7 +1,7 @@
 'use client'
 
 import { useUser } from "@clerk/nextjs"
-import { Button, TextField, Container, Typography, DialogTitle, Dialog, DialogContent, DialogContentText, DialogActions, Box, Grid, Card, CardActionArea, CardContent, CircularProgress } from "@mui/material";
+import { Button, TextField, Container, Typography, DialogTitle, Dialog, DialogContent, DialogContentText, DialogActions, Box, Grid, Card, CardActionArea, CardContent, CircularProgress, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import { collection, doc, getDoc, writeBatch } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,7 +13,9 @@ export default function Generate(){
     const {isLoaded, isSignedIn, user} = useUser();
     const [flashcards, setFlashcards] = useState([]);
     const [flipped, setFlipped] = useState({});
+    const [inputMode, setInputMode] = useState('text');
     const [text, setText] = useState('');
+    const [file, setFile] = useState(null);
     const [name, setName] = useState('');
     const [open, setOpen] = useState(false);
     const router = useRouter();
@@ -28,16 +30,80 @@ export default function Generate(){
         return <Loader />;
     }
 
-    const handleSubmit = async() =>{
-        fetch('api/generate', {
-            method: 'POST',
-            body: text,
-        })
-        .then((res) => res.json())
-        .then((data) => {
+    // const handleSubmit = async () => {
+    //     let textToSubmit = text;
+    
+    //     if (inputMode === 'file' && file) {
+    //         textToSubmit = await new Promise((resolve, reject) => {
+    //             const reader = new FileReader();
+    //             reader.onload = (e) => {
+    //                 resolve(e.target.result);
+    //             };
+    //             reader.onerror = (error) => reject(error);
+    //             reader.readAsText(file);
+    //         });
+    //     }
+    
+    //     try {
+    //         const response = await fetch('api/generate', {
+    //             method: 'POST',
+    //             body: textToSubmit,
+    //         });
+    
+    //         if (!response.ok) {
+    //             const errorData = await response.json();
+    //             throw new Error(errorData.message || 'An error occurred while generating flashcards. Please try again.');
+    //         }
+    
+    //         const data = await response.json();
+    //         setFlashcards(data);
+    //     } catch (error) {
+    //         console.error("Error during generation:", error);
+    //         alert(error.message);
+    //     }
+    // };
+
+    const handleSubmit = async () => {
+        let textToSubmit = text;
+    
+        if (inputMode === 'file' && file) {
+            // Check if the file type is not .txt
+            if (file.type !== 'text/plain') {
+                alert("Supported File Types: .txt");
+                return;
+            }
+    
+            textToSubmit = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    resolve(e.target.result);
+                };
+                reader.onerror = (error) => reject(error);
+                reader.readAsText(file);
+            });
+        }
+    
+        try {
+            const response = await fetch('api/generate', {
+                method: 'POST',
+                body: textToSubmit,
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'An error occurred while generating flashcards. Please try again.');
+            }
+    
+            const data = await response.json();
             setFlashcards(data);
-        })
-    }
+        } catch (error) {
+            console.error("Error during generation:", error);
+            alert(error.message);
+        }
+    };
+    
+    
+    
 
     const handleCardClick = (id) => {
         setFlipped((prev) => ({
@@ -97,14 +163,33 @@ export default function Generate(){
     <Box sx={{ width: '100%', minHeight: '100vh' }} className="bg-primaryBlue">
 
         <Header/>
-        <Container maxWidth="lg" style={{                 
-                backgroundColor: '#ffc0cb',
-                padding: '20px',
-                borderRadius: '8px',
-                marginTop: '40px',
-                }}>
 
-            <TextField
+{/* <Container
+    maxWidth="lg"
+    style={{                 
+        backgroundColor: '#ffc0cb',
+        padding: '20px',
+        borderRadius: '8px',
+        marginTop: '40px',
+    }}
+>
+    <ToggleButtonGroup
+        value={inputMode}
+        exclusive
+        onChange={(e, newMode) => setInputMode(newMode)}
+        aria-label="input mode"
+        style={{ marginBottom: '20px' }}
+    >
+        <ToggleButton value="text" aria-label="text input">
+            Text
+        </ToggleButton>
+        <ToggleButton value="file" aria-label="file input">
+            File
+        </ToggleButton>
+    </ToggleButtonGroup>
+
+    {inputMode === 'text' ? (
+        <TextField
             label="Enter text"
             variant="outlined"
             fullWidth
@@ -117,13 +202,87 @@ export default function Generate(){
             InputLabelProps={{
                 style: { color: 'white' },
             }}
-            />
+        />
+    ) : (
+        <input
+            type="file"
+            accept=".txt"
+            onChange={(e) => setFile(e.target.files[0])}
+            style={{ marginBottom: '20px', color: 'white' }}
+        />
+    )}
 
-        <Button variant="contained" className="bg-primaryBlue" fullWidth onClick={handleSubmit}>
-            Generate
-        </Button>
-            
-        </Container>
+    <Button
+        variant="contained"
+        className="bg-primaryBlue"
+        fullWidth
+        onClick={handleSubmit}
+    >
+        Generate
+    </Button>
+</Container> */}
+
+<Container
+    maxWidth="lg"
+    style={{                 
+        backgroundColor: '#ffc0cb',
+        padding: '20px',
+        borderRadius: '8px',
+        marginTop: '40px',
+    }}
+>
+    <ToggleButtonGroup
+        value={inputMode}
+        exclusive
+        onChange={(e, newMode) => setInputMode(newMode)}
+        aria-label="input mode"
+        style={{ marginBottom: '20px' }}
+    >
+        <ToggleButton value="text" aria-label="text input">
+            Text
+        </ToggleButton>
+        <ToggleButton value="file" aria-label="file input">
+            File
+        </ToggleButton>
+    </ToggleButtonGroup>
+
+    {inputMode === 'text' && (
+        <TextField
+            label="Enter text"
+            variant="outlined"
+            fullWidth
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            style={{ marginBottom: '20px' }}
+            InputProps={{
+                style: { color: 'white' },
+            }}
+            InputLabelProps={{
+                style: { color: 'white' },
+            }}
+        />
+    )}
+
+    {inputMode === 'file' && (
+        <input
+            type="file"
+            accept=".txt"
+            onChange={(e) => setFile(e.target.files[0])}
+            style={{ marginBottom: '20px', color: 'white' }}
+        />
+    )}
+
+    <Button
+        variant="contained"
+        className="bg-primaryBlue"
+        fullWidth
+        onClick={handleSubmit}
+    >
+        Generate
+    </Button>
+</Container>
+
+
 
 
 

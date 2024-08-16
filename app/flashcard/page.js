@@ -50,7 +50,7 @@ export default function Flashcard() {
     const handleCardClick = (id) => {
         setFlipped((prev) => ({
             ...prev,
-            [id]: !prev[id],  // Toggle the specific card's flip state
+            [id]: !prev[id],
         }));
     };
 
