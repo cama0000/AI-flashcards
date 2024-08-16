@@ -1,7 +1,7 @@
 'use client'
 
 import { useUser } from '@clerk/nextjs'
-import { collection, getDoc, setDoc, doc } from 'firebase/firestore';
+import { collection, getDoc, setDoc, doc, getDocs, deleteDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '@/firebase';
 import { Grid, Container, Card, CardActionArea, CardContent, Typography, Box, IconButton } from '@mui/material';
@@ -78,33 +78,33 @@ export default function Flashcard(){
   if (!isLoaded || !isSignedIn) return <Loader />;
 
   const handleDelete = async (name) => {
-    alert('Delete this flashcard set');
-    // if (window.confirm('Are you sure you want to delete this flashcard set?')) {
-    //     try {
-    //         const docRef = doc(collection(db, 'users'), user.id);
-    //         const docSnap = await getDoc(docRef);
+    // alert('Delete this flashcard set');
+    if (window.confirm('Are you sure you want to delete this flashcard set?')) {
+        try {
+            const docRef = doc(collection(db, 'users'), user.id);
+            const docSnap = await getDoc(docRef);
 
-    //         if (docSnap.exists()) {
-    //             const collections = docSnap.data().flashcards || [];
-    //             const updatedCollections = collections.filter((flashcard) => flashcard.name !== name);
+            if (docSnap.exists()) {
+                const collections = docSnap.data().flashcards || [];
+                const updatedCollections = collections.filter((flashcard) => flashcard.name !== name);
 
-    //             // Update Firestore document
-    //             await setDoc(docRef, { flashcards: updatedCollections }, { merge: true });
+                // Update Firestore document
+                await setDoc(docRef, { flashcards: updatedCollections }, { merge: true });
 
-    //             // Optionally delete the collection from Firestore if you have separate documents for each set
-    //             const flashcardColRef = collection(docRef, name);
-    //             const querySnapshot = await getDocs(flashcardColRef);
-    //             querySnapshot.forEach(async (doc) => {
-    //                 await deleteDoc(doc.ref);
-    //             });
+                // Optionally delete the collection from Firestore if you have separate documents for each set
+                const flashcardColRef = collection(docRef, name);
+                const querySnapshot = await getDocs(flashcardColRef);
+                querySnapshot.forEach(async (doc) => {
+                    await deleteDoc(doc.ref);
+                });
 
-    //             // Update local state
-    //             setFlashcards(updatedCollections);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error deleting flashcard set:', error);
-    //     }
-    // }
+                // Update local state
+                setFlashcards(updatedCollections);
+            }
+        } catch (error) {
+            console.error('Error deleting flashcard set:', error);
+        }
+    }
     };
 
 
