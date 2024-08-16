@@ -22,7 +22,9 @@ export default function Header(){
           </SignedOut>
 
           <SignedIn>
-            <UserButton               
+            <Button className='hover:scale-110 duration-300' color="inherit" href='/generate'>Generate</Button>
+            <Button className='hover:scale-110 duration-300' color="inherit" href='/flashcards'>Cards</Button>
+            <UserButton
               sx={{
                 width: 48,
                 height: 48,

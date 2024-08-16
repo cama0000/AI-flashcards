@@ -14,38 +14,72 @@ export default function Flashcard(){
     const [flashcards, setFlashcards] = useState([]);
     const router = useRouter();
 
-    useEffect(() => {
-      if (isLoaded && !isSignedIn) {
-          router.push('/');
-      }
-    }, [isLoaded, isSignedIn, router]);
+    // useEffect(() => {
+    //   if (isLoaded && !isSignedIn) {
+    //       router.push('/');
+    //   }
+    // }, [isLoaded, isSignedIn, router]);
 
-    if (!isLoaded || !isSignedIn) {
-        return <Loader />;
-    }
+    // if (!isLoaded || !isSignedIn) {
+    //     return <Loader />;
+    // }
     
+    // useEffect(() => {
+    //     async function getFlashcards() {
+    //         if(!user) return;
+
+    //         // check to see if document exsists
+    //         const docRef = doc(collection(db, 'users'), user.id);
+    //         const docSnap = await getDoc(docRef);
+
+    //         if(docSnap.exists()){
+    //             // get all collection names
+    //             const collections = docSnap.data().flashcards;
+    //             setFlashcards(collections);
+    //         }
+    //         else{
+    //             await setDoc(docRef, {});
+    //         }
+    //     }
+
+    //     getFlashcards();
+    // }, [user]);
+
+    // if (!isLoaded || !isSignedIn) return null;
+
+
+
+
+
+
     useEffect(() => {
-        async function getFlashcards() {
-            if(!user) return;
+      async function getFlashcards() {
+          if (!user) return;
 
-            // check to see if document exsists
-            const docRef = doc(collection(db, 'users'), user.id);
-            const docSnap = await getDoc(docRef);
+          // check to see if document exists
+          const docRef = doc(collection(db, 'users'), user.id);
+          const docSnap = await getDoc(docRef);
 
-            if(docSnap.exists()){
-                // get all collection names
-                const collections = docSnap.data().flashcards;
-                setFlashcards(collections);
-            }
-            else{
-                await setDoc(docRef, {});
-            }
-        }
+          if (docSnap.exists()) {
+              // get all collection names
+              const collections = docSnap.data().flashcards;
+              setFlashcards(collections);
+          } else {
+              await setDoc(docRef, {});
+          }
+      }
 
-        getFlashcards();
-    }, [user]);
+      if (user) {
+          getFlashcards();
+      }
+  }, [user]);
 
-    if (!isLoaded || !isSignedIn) return null;
+  if (!isLoaded || !isSignedIn) return <Loader />;
+
+
+
+
+
 
     const handleCardClick = (id) => {
         router.push(`/flashcard?id=${id}`);
