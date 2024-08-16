@@ -41,13 +41,10 @@ export default function Generate(){
 
     const handleCardClick = (id) => {
         setFlipped((prev) => ({
+            ...prev,
             [id]: !prev[id],
-        }))
-    }
-
-    // const toggleFlip = (id) => {
-    //     setFlipped(prev => ({ ...prev, [id]: !prev[id] }));
-    // };
+        }));
+    };
 
     const handleOpen = () => {
         setOpen(true);

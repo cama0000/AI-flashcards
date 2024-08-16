@@ -16,7 +16,7 @@ export default function Flashcard() {
     const searchParams = useSearchParams();
     const search = searchParams.get('id');
     const [flashcards, setFlashcards] = useState([]);
-    const [flipped, setFlipped] = useState({});  // Track flip state of each card
+    const [flipped, setFlipped] = useState({});
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [front, setFront] = useState('');
