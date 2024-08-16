@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { db } from '@/firebase';
 import Loader from "../components/Loader";
+import Header from "../components/Header";
 
 // TODO: Check if signed in or not
 
@@ -45,6 +46,10 @@ export default function Generate(){
             [id]: !prev[id],
         }))
     }
+
+    // const toggleFlip = (id) => {
+    //     setFlipped(prev => ({ ...prev, [id]: !prev[id] }));
+    // };
 
     const handleOpen = () => {
         setOpen(true);
@@ -93,7 +98,16 @@ export default function Generate(){
     }
 
     return (
-        <Container maxWidth="sm" style={{ marginTop: '50px' }}>
+        <>
+    <Box sx={{ width: '100%', minHeight: '100vh' }} className="bg-primaryBlue">
+
+        <Header/>
+        <Container maxWidth="lg" style={{                 
+                backgroundColor: '#ffc0cb',
+                padding: '20px',
+                borderRadius: '8px',
+                marginTop: '40px',
+                }}>
 
             <TextField
             label="Enter text"
@@ -103,27 +117,35 @@ export default function Generate(){
             onChange={(e) => setText(e.target.value)}
             style={{ marginBottom: '20px' }}
             InputProps={{
-                style: { color: 'white' }, // Set text color to white
+                style: { color: 'white' },
             }}
             InputLabelProps={{
-                style: { color: 'white' }, // Set label color to white
+                style: { color: 'white' },
             }}
             />
 
-<Button variant="contained" color="secondary" fullWidth onClick={handleSubmit}>
-            Generate Flashcards
+        <Button variant="contained" className="bg-primaryBlue" fullWidth onClick={handleSubmit}>
+            Generate
         </Button>
+            
+        </Container>
 
 
 
         {flashcards.length > 0 && (
-            <Box sx={{mt: 4}}>
-                <Typography variant="h5">
-                    Flashcards Preview
+                    <Container maxWidth="lg" style={{                 
+                        backgroundColor: '#ffc0cb',
+                        padding: '20px',
+                        borderRadius: '8px',
+                        marginTop: '40px',
+                        }}>
+            <Box>
+                <Typography variant="h3" sx={{fontStyle: 'bold'}} gutterBottom>
+                    Preview
                 </Typography>
-                <Grid container spacing={3}>
                     
                     {/* maps cards */}
+            <Grid container spacing={3}>
                     {flashcards.map((flashcard, index) => (
                         <Grid item xs={12} sm={6} md={4} key={index}>
                             <Card>
@@ -183,6 +205,7 @@ export default function Generate(){
                     </Button>
                 </Box>
             </Box>
+            </Container>
         )}
 
 
@@ -224,7 +247,8 @@ export default function Generate(){
                 </Button>
             </DialogActions>
         </Dialog>
-      </Container>
+      </Box>
+      </>
     )
 
 }
