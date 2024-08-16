@@ -4,10 +4,11 @@ import { useUser } from '@clerk/nextjs';
 import { collection, doc, getDocs } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '@/firebase';
-import { Grid, Container, Card, CardActionArea, CardContent, Typography } from '@mui/material';
+import { Grid, Container, Card, CardActionArea, CardContent, Typography, Button, Box } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
 import Loader from '../components/Loader';
 import { useRouter } from 'next/navigation';
+import Header from '../components/Header';
 
 export default function Flashcard() {
     const { isSignedIn, isLoaded, user } = useUser();
@@ -23,10 +24,6 @@ export default function Flashcard() {
         }
     }, [isLoaded, isSignedIn, router]);
 
-    if (!isLoaded || !isSignedIn) {
-        return <Loader />;
-    }
-
     useEffect(() => {
         async function getFlashcard() {
             if (!search || !user) return;
@@ -34,6 +31,7 @@ export default function Flashcard() {
             const colRef = collection(doc(db, 'users', user.id), search);
             const querySnapshot = await getDocs(colRef);
             const cards = [];
+
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 cards.push({ id: doc.id, ...data });
@@ -54,22 +52,38 @@ export default function Flashcard() {
     }
 
     return (
-        <Container maxWidth="md">
+    <>
+    <Box sx={{ width: '100%', minHeight: '100vh' }} className="bg-primaryBlue">
+        <Header />
+        <Container
+            maxWidth="md"
+            sx={{
+                backgroundColor: '#ffc0cb',
+                padding: '20px',
+                borderRadius: '8px',
+                marginTop: '40px',
+            }}
+        >
             <Grid container spacing={3} sx={{ mt: 4 }}>
-                {flashcards.map((flashcard) => (
-                    <Grid item xs={12} sm={6} md={4} key={flashcard.id}>
-                        <Card>
-                            <CardActionArea onClick={() => toggleFlip(flashcard.id)}>
-                                <CardContent>
-                                    <Typography variant="h5" component="div">
-                                        {flipped[flashcard.id] ? flashcard.back : flashcard.front}
-                                    </Typography>
-                                </CardContent>
-                            </CardActionArea>
-                        </Card>
+                {flashcards.map((flashcard, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={index}>
+                        <CardActionArea
+                            onClick={() => toggleFlip(flashcard.id)}
+                            sx={{ height: '100%' }}
+                        >
+                            <Card sx={{ minHeight: '250px', display: 'flex', alignItems: 'center' }}>
+                                                         <CardContent>
+                                     <Typography variant="h5" component="div">
+                                         {flipped[flashcard.id] ? flashcard.back : flashcard.front}
+                                     </Typography>
+                                 </CardContent>
+                            </Card>
+                        </CardActionArea>
                     </Grid>
                 ))}
             </Grid>
         </Container>
+    </Box>
+</>
     );
 }
