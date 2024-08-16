@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import Loader from '../components/Loader';
 import Header from '../components/Header';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { toast } from 'react-toastify';
 
 export default function Flashcard(){
     const {isLoaded, isSignedIn, user} = useUser();
@@ -100,6 +101,7 @@ export default function Flashcard(){
 
                 // Update local state
                 setFlashcards(updatedCollections);
+                toast.success("Deck deleted successfully!");
             }
         } catch (error) {
             console.error('Error deleting flashcard set:', error);
