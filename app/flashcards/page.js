@@ -4,12 +4,13 @@ import { useUser } from '@clerk/nextjs'
 import { collection, getDoc, setDoc, doc, getDocs, deleteDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '@/firebase';
-import { Grid, Container, Card, CardActionArea, CardContent, Typography, Box, IconButton } from '@mui/material';
+import { Grid, Container, Card, CardActionArea, CardContent, Typography, Box, IconButton, Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import Loader from '../components/Loader';
 import Header from '../components/Header';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 
 export default function Flashcard(){
     const {isLoaded, isSignedIn, user} = useUser();
@@ -154,56 +155,92 @@ export default function Flashcard(){
 
 
 <Grid container spacing={3} sx={{ mt: 4 }}>
-                        {flashcards.map((flashcard, index) => (
-                            <Grid item xs={12} sm={6} md={4} key={index}>
-                                                                    <CardActionArea
-                                        onClick={() => handleCardClick(flashcard.name)}
-                                        sx={{ height: '100%' }}
-                                    >
-                                <Card
-                                    sx={{
-                                        minHeight: '250px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        position: 'relative',
-                                        '&:hover .delete-icon': {
-                                            opacity: 1,
-                                        },
-                                    }}
-                                >
-                                        <CardContent sx={{ textAlign: 'center', width: '100%' }}>
-                                            <Typography
-                                                variant="h5"
-                                                component="div"
-                                                sx={{ fontWeight: 'bold' }}
-                                            >
-                                                {flashcard.name}
-                                            </Typography>
-                                        </CardContent>
-                                    <IconButton
-                                        aria-label="delete"
-                                        onClick={(event) => {
-                                            event.stopPropagation(); // Prevents the click from triggering the CardActionArea onClick
-                                            handleDelete(flashcard.name);
-                                        }}
-                                        className="delete-icon"
-                                        sx={{
-                                            position: 'absolute',
-                                            top: 8,
-                                            right: 8,
-                                            color: 'red',
-                                            opacity: 0,
-                                            transition: 'opacity 0.3s',
-                                        }}
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </Card>
-                                </CardActionArea>
+    {flashcards.length === 0 ? (
+        <Grid item xs={12}>
+        <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center'
+        }}>
+            <Typography 
+                variant="h5" 
+                component="div" 
+                sx={{ 
+                    textAlign: 'center', 
+                    color: 'white', 
+                    fontStyle: 'italic',
+                    mb: 2 
+                }}
+            >
+                Oh no! No flashcards available. Start by generating a new set!
+            </Typography>
+            <Button 
+                variant="contained" 
+                color="primary" 
+                component={Link} 
+                href="/generate"
+                sx={{ 
+                    textTransform: 'none',
+                }}
+            >
+                Generate
+            </Button>
+        </Box>
+    </Grid>
+    
+    ) : (
+        flashcards.map((flashcard, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+                <CardActionArea
+                    onClick={() => handleCardClick(flashcard.name)}
+                    sx={{ height: '100%' }}
+                >
+                    <Card
+                        sx={{
+                            minHeight: '250px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            position: 'relative',
+                            '&:hover .delete-icon': {
+                                opacity: 1,
+                            },
+                        }}
+                    >
+                        <CardContent sx={{ textAlign: 'center', width: '100%' }}>
+                            <Typography
+                                variant="h5"
+                                component="div"
+                                sx={{ fontWeight: 'bold' }}
+                            >
+                                {flashcard.name}
+                            </Typography>
+                        </CardContent>
+                        <IconButton
+                            aria-label="delete"
+                            onClick={(event) => {
+                                event.stopPropagation(); // Prevents the click from triggering the CardActionArea onClick
+                                handleDelete(flashcard.name);
+                            }}
+                            className="delete-icon"
+                            sx={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                color: 'red',
+                                opacity: 0,
+                                transition: 'opacity 0.3s',
+                            }}
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    </Card>
+                </CardActionArea>
+            </Grid>
+        ))
+    )}
+</Grid>
 
-                            </Grid>
-                        ))}
-                    </Grid>
 
 
 
